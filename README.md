@@ -1,4 +1,5 @@
-# DLCV Final Project ( Warehouse Spatial Intelligence )
+# DLCV Final Project
+( Warehouse Spatial Intelligence )
 
 # How to run your code?
 * TODO: Please provide the scripts for TAs to reproduce your results, including training and inference. For example, 
