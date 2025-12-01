@@ -22,5 +22,5 @@ Please click [this link](https://huggingface.co/datasets/nvidia/PhysicalAI-Spati
 # Q&A
 If you have any problems related to Final Project, you may
 - Use TA hours
-- Contact TAs by e-mail ([ntudlcv@gmail.com](mailto:ntudlcv@gmail.com))
+- Contact TAs by e-mail ([ntu-dlcv-2025-fall-ta@googlegroups.com](mailto:ntu-dlcv-2025-fall-ta@googlegroups.com))
 - Post your question under Final Project FAQ section in NTU Cool Discussion
