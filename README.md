@@ -1,19 +1,12 @@
 # DLCV Final Project ( Warehouse Spatial Intelligence )
 
-# How to run your code?
-* TODO: Please provide the scripts for TAs to reproduce your results, including training and inference. For example, 
-```shell script=
-bash train.sh <Path to videos folder> <annotation file> [additional path(s)...]
-bash inference.sh <Path to videos folder> <annotation file>
-```
-* For the **training code**, feel free to add extra paths to your training script if you want to use additional data such as bounding boxes or hyper-graphs.
-* You can modify `.gitignore` file to avoid uploading your data
-
 # Notice
-Please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
+1. Please write your readme file clearly.
+2. Please write your README clearly, including step-by-step instructions on how to run your code.
+3. Please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
 
 # Dataset 
-Please click [this link](https://huggingface.co/datasets/nvidia/PhysicalAI-Spatial-Intelligence-Warehouse) and follow the instruction to download the dataset.
+Please click [this link](https://huggingface.co/datasets/yaguchi27/DLCV_Final1?fbclid=IwY2xjawOaLR9leHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEeocpm74PJ10FFgl66Byw0iJksQVcHBSvJ1nJMCXAKDltmAfpIS-k4kMzPYWw_aem_U6QUG06tJIJ--JHPvPxUhA) and follow the instruction to download the dataset.
 
 # Submission Rules
 ### Deadline
