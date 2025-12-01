@@ -10,7 +10,7 @@ bash inference.sh <Path to videos folder> <annotation file>
 * You can modify `.gitignore` file to avoid uploading your data
 
 # Notice
-For more details, please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
+Please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
 
 # Dataset 
 Please click [this link](https://huggingface.co/datasets/nvidia/PhysicalAI-Spatial-Intelligence-Warehouse) and follow the instruction to download the dataset.
