@@ -9,7 +9,7 @@ bash inference.sh <Path to videos folder> <annotation file>
 * For the **training code**, feel free to add extra paths to your training script if you want to use additional data such as bounding boxes or hyper-graphs.
 * You can modify `.gitignore` file to avoid uploading your data
 
-# Usage
+# Notice
 For more details, please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
 
 # Dataset 
