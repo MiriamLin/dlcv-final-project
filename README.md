@@ -12,7 +12,7 @@
 conda create -p .conda python=3.14 -y
 conda activate ./.conda
 ```
-2. Install Python dependencies (Adjust pytorch installation with your CUDA version)
+2. Install Python dependencies
 ```
 pip3 install -r requirements.txt
 ```
