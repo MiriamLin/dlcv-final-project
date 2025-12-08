@@ -6,6 +6,17 @@
 2. Please write your README clearly, including step-by-step instructions on how to run your code.
 3. Please click [this link](https://docs.google.com/presentation/d/1wbZBPT7-C7j0wt5RqpNxZMWoqZKYw1fdizRz9hojfeQ/edit?slide=id.g3196368f9ef_0_0#slide=id.g3196368f9ef_0_0) to view the slides of Final Project - Warehouse Spatial Intelligence. **Note that video and introduction pdf files for final project can be accessed in your NTU COOL.**
 
+## 🔧 Installation
+1. Create and activate a conda environment with Python 3.14
+```
+conda create -p .conda python=3.14 -y
+conda activate ./.conda
+```
+2. Install Python dependencies (Adjust pytorch installation with your CUDA version)
+```
+pip3 install -r requirements.txt
+```
+
 # Dataset 
 Please click [this link](https://huggingface.co/datasets/yaguchi27/DLCV_Final1?fbclid=IwY2xjawOaLR9leHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEeocpm74PJ10FFgl66Byw0iJksQVcHBSvJ1nJMCXAKDltmAfpIS-k4kMzPYWw_aem_U6QUG06tJIJ--JHPvPxUhA) and follow the instruction to download the dataset.
 
