@@ -11,19 +11,31 @@ from tqdm import tqdm
 parser = ArgumentParser()
 parser.add_argument("--data_dir", type=Path, required=True)
 parser.add_argument("--json_file", type=Path, required=True)
+parser.add_argument("--ckpt_dir", type=Path, default=Path("ckpt"))
+parser.add_argument("--no_depth", action="store_true")
+parser.add_argument("--no_rgb", action="store_true")
+parser.add_argument("--log_scale", action="store_true")
 args = parser.parse_args()
 
-Path('ckpt').mkdir(exist_ok=True)
+ckpt_dir = args.ckpt_dir
+ckpt_dir.mkdir(exist_ok=True)
 
-dataset = DistanceDataset(args.data_dir, args.json_file, rgb=True, depth=True)
+use_depth = not args.no_depth
+use_rgb = not args.no_rgb
+
+dataset = DistanceDataset(args.data_dir, args.json_file, rgb=use_rgb, depth=use_depth, min_distance=0.01)
 loader = DataLoader(dataset, batch_size=18, shuffle=True, num_workers=4)
 
-model = ResNetDistanceRegressor(input_channels=6, backbone='resnet50', pretrained=True).cuda()
+input_channels = 2 + use_depth + 3 * use_rgb
+
+model = ResNetDistanceRegressor(input_channels=input_channels, backbone='resnet50', pretrained=True).cuda()
 optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=0)
 criterion = nn.MSELoss()
 
 print(f"Dataset size: {len(dataset)}")
 print(f"Number of batches: {len(loader)}")
+
+log_scale = args.log_scale
 
 # Training loop
 num_epochs = 5
@@ -37,6 +49,9 @@ for epoch in tqdm(range(num_epochs), position=0, leave=True):
     for i, (inputs, targets) in tqdm(enumerate(loader), total=num_batches, position=1, leave=False):
         inputs, targets = inputs.cuda(), targets.cuda()
         preds = model(inputs)
+        if log_scale:
+            preds = torch.log(preds)
+            targets = torch.log(targets)
         loss = criterion(preds, targets)
 
         optimizer.zero_grad()
@@ -54,5 +69,5 @@ for epoch in tqdm(range(num_epochs), position=0, leave=True):
     avg_loss = epoch_loss / num_batches
     print(f"[Epoch {epoch+1}/{num_epochs}] Average Loss: {avg_loss:.4f}")
 
-    torch.save(model.state_dict(), f"ckpt/epoch_{epoch+1}.pth")
+    torch.save(model.state_dict(), ckpt_dir / f"epoch_{epoch+1}.pth")
     print(f"Model saved at epoch {epoch+1}")

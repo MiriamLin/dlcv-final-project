@@ -55,4 +55,4 @@ class ResNetDistanceRegressor(nn.Module):
         )
 
     def forward(self, x):
-        return self.resnet(x).squeeze(1)  # Output shape: (B,)
+        return torch.exp(self.resnet(x).squeeze(1))  # Output shape: (B,)
