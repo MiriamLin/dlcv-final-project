@@ -15,6 +15,7 @@ parser.add_argument("--ckpt_dir", type=Path, default=Path("ckpt"))
 parser.add_argument("--no_depth", action="store_true")
 parser.add_argument("--no_rgb", action="store_true")
 parser.add_argument("--log_scale", action="store_true")
+parser.add_argument("--num_epochs", type=int, default=5)
 args = parser.parse_args()
 
 ckpt_dir = args.ckpt_dir
@@ -38,7 +39,7 @@ print(f"Number of batches: {len(loader)}")
 log_scale = args.log_scale
 
 # Training loop
-num_epochs = 5
+num_epochs = args.num_epochs
 for epoch in tqdm(range(num_epochs), position=0, leave=True):
     tqdm.write(f"Starting epoch {epoch + 1}/{num_epochs}")
     model.train()
