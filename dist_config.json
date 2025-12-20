@@ -1,0 +1,5 @@
+{
+    "model_path": "dist.pth",
+    "use_rgb": false,
+    "use_depth": true
+}
