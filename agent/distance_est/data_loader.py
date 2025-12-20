@@ -30,7 +30,7 @@ class DistanceDataset(Dataset):
         print(f"Number of samples: {len(self.samples)}")
 
         print(f"Apply data filtering: Min distance: {min_distance}, Max distance: {max_distance}")
-        self.samples = [s for s in self.samples if s['normalized_answer'] >= min_distance and s['normalized_answer'] <= max_distance]
+        self.samples = [s for s in self.samples if s['normalized_answer'] >= min_distance and s['normalized_answer'] <= max_distance and s['image'] != "034000.png"]
         print(f"Number of samples after filtering: {len(self.samples)}")
 
     def __len__(self):

@@ -36,7 +36,7 @@ STR_TRANSPORTERS = "transporters"
 
 STR_UNKNOWN = "unknown"
 
-CATS = [STR_BUFFER, STR_PALLET, STR_SHELF, STR_TRANSPORTER]
+CATS = [STR_PALLET, STR_BUFFER, STR_SHELF, STR_TRANSPORTER]
 
 def cat_plural(cat: str) -> str:
     if cat == STR_BUFFER: return STR_BUFFERS
@@ -96,41 +96,41 @@ def select_shelf(question: str, shelf_masks: list[Mask]) -> Mask:
     if len(shelf_masks) == 1:
         return shelf_masks[0]
     if STR_LEFT in question:
-        return sorted(shelf_masks)[0]
+        return min(shelf_masks)
     assert STR_RIGHT in question
-    return sorted(shelf_masks)[-1]
+    return max(shelf_masks)
 
 def select_buffer(question: str, buffer_masks: list[Mask], shelf_masks: list[Mask]) -> Mask:
     assert len(buffer_masks) > 0, question
     
     if STR_CLOSE in question:
         shelf_mask = select_shelf(question, shelf_masks)
-        return sorted(buffer_masks, key=lambda x: tools.proxy_dist(x, shelf_mask))[0]
+        return min(buffer_masks, key=lambda x: tools.proxy_dist(x, shelf_mask))
     
     if STR_LEFT in question:
-        return sorted(buffer_masks)[0]
+        return min(buffer_masks)
 
     if STR_RIGHT in question:
-        return sorted(buffer_masks)[-1]
+        return max(buffer_masks)
 
     assert STR_MIDDLE in question
     return sorted(buffer_masks)[(len(buffer_masks) + 1) // 2]
 
-def pred_count(item: dict) -> int:
+def pred_count(item: dict, inclusion_model: tools.InclusionModel, data_dir: Path | None) -> int:
     question: str = item[STR_CONVERSATIONS][0][STR_VALUE]
     cat_masks = categorize_masks(question, [Mask(i) for i in item[STR_RLE]])
     assert len(cat_masks[STR_PALLET]) > 0
     buffer_mask = select_buffer(question, cat_masks[STR_BUFFER], cat_masks[STR_SHELF])
-    return np.count_nonzero([tools.inclusion(pallet_mask, buffer_mask) > 0.2 for pallet_mask in cat_masks[STR_PALLET]])
+    return np.count_nonzero([inclusion_model.predict(pallet_mask, buffer_mask, item[STR_IMAGE], data_dir) > 0.5 for pallet_mask in cat_masks[STR_PALLET]])
 
 def select_target(question: str, cat_masks: dict[str, list[Mask]]) -> Mask:
     filtered_cat_masks = {k: v for k, v in cat_masks.items() if len(v) > 0}
     if min([len(x) for x in filtered_cat_masks.values()]) == 1:
-        return sorted(filtered_cat_masks.values(), key=lambda l: len(l))[0][0]
+        return min(filtered_cat_masks.values(), key=lambda l: len(l))[0]
     if len(cat_masks[STR_BUFFER]) > 0 and len(cat_masks[STR_SHELF]) > 0:
         return select_shelf(question, cat_masks[STR_SHELF])
     assert len(cat_masks[STR_PALLET]) > 0 and len(cat_masks[STR_TRANSPORTER]) > 0
-    return sorted(cat_masks[STR_TRANSPORTER], key=lambda transporter: sum([tools.inclusion(pallet, transporter) for pallet in cat_masks[STR_PALLET]]))[0]
+    return min(cat_masks[STR_TRANSPORTER], key=lambda transporter: sum([tools.inclusion(pallet, transporter) for pallet in cat_masks[STR_PALLET]]))
 
 def select_mcq_answer(question: str, masks: list[Mask], dist_model: tools.DistModel, image_name: Path | None, data_dir: Path | None) -> Mask:
     cat_masks = categorize_masks(question, masks)
@@ -141,15 +141,15 @@ def select_mcq_answer(question: str, masks: list[Mask], dist_model: tools.DistMo
     
     assert num_cats == 2
     target = select_target(question, cat_masks)
-    candidates = sorted(filtered_cat_masks.values(), key=lambda l: len(l))[1]
-    return sorted(candidates, key=lambda x: dist_model.predict(x, target, image_name, data_dir))[0]
+    candidates = max(filtered_cat_masks.values(), key=lambda l: len(l))
+    return min(candidates, key=lambda x: dist_model.predict(x, target, image_name, data_dir))
 
 def pred_mcq(item: dict, dist_model: tools.DistModel, data_dir: Path | None = None) -> int:
     masks = [Mask(i) for i in item[STR_RLE]]
     question = item[STR_CONVERSATIONS][0][STR_VALUE]
     return masks.index(select_mcq_answer(question, masks, dist_model, item[STR_IMAGE], data_dir))
 
-def pred_dist(item: dict, dist_model: tools.DistModel, data_dir: Path | None = None) -> float:
+def pred_dist(item: dict, dist_model: tools.DistModel, inclusion_model: tools.InclusionModel, data_dir: Path | None = None) -> float:
     image_name = item[STR_IMAGE]
     masks = [Mask(i) for i in item[STR_RLE]]
     if len(masks) == 2:
@@ -163,21 +163,27 @@ def pred_dist(item: dict, dist_model: tools.DistModel, data_dir: Path | None = N
     question = item[STR_CONVERSATIONS][0][STR_VALUE]
     cat_masks = categorize_masks(question, masks)
 
+    target_cats: list[str] = []
     targets: list[Mask] = []
     for cat in CATS:
         if "leftmost " + cat in question or "left most " + cat in question or cat + " on the left" in question:
-            targets.append(sorted(cat_masks[cat])[0])
+            targets.append(min(cat_masks[cat]))
+            target_cats.append(cat)
         if "rightmost " + cat in question or "right most " +  cat in question or cat + " on the right" in question:
-            targets.append(sorted(cat_masks[cat])[-1])
+            targets.append(max(cat_masks[cat]))
+            target_cats.append(cat)
         if "middle " + cat in question:
             targets.append(sorted(cat_masks[cat])[(len(cat_masks[cat]) + 1) // 2])
-    
+            target_cats.append(cat)
+
     if len(targets) == 2:
         return dist_model.predict(
             targets[0],
             targets[1],
             image_name,
-            data_dir
+            data_dir,
+            target_cats == [STR_PALLET, STR_BUFFER],
+            inclusion_model
         )
 
     targets += cat_masks[STR_SHELF] + cat_masks[STR_TRANSPORTER]
@@ -191,39 +197,45 @@ def pred_dist(item: dict, dist_model: tools.DistModel, data_dir: Path | None = N
         data_dir
     )
 
-def pred(item: dict, dist_model: tools.DistModel, data_dir: Path | None = None) -> str | int | float:
+def pred(item: dict, dist_model: tools.DistModel, inclusion_model: tools.InclusionModel, data_dir: Path | None = None) -> str | int | float:
     cat = pred_cat(item[STR_CONVERSATIONS][0][STR_VALUE])
     if cat == STR_LEFT_RIGHT:
         return pred_lr(item)
     if cat == STR_COUNT:
-        return pred_count(item)
+        return pred_count(item, inclusion_model, data_dir)
     if cat == STR_MCQ:
         return pred_mcq(item, dist_model, data_dir)
     assert cat == STR_DIST
-    return pred_dist(item, dist_model, data_dir)
+    return pred_dist(item, dist_model, inclusion_model, data_dir)
 
 def main():
     parser = ArgumentParser()
     parser.add_argument("--json_file", type=Path, required=True)
     parser.add_argument("--data_dir", type=Path, required=True)
     parser.add_argument("--prediction_file", type=Path, required=True)
-    parser.add_argument("--config_path", type=Path, required=True)
+    parser.add_argument("--dist_config_path", type=Path, required=True)
+    parser.add_argument("--inclusion_config_path", type=Path, required=True)
     args = parser.parse_args()
 
     json_file = args.json_file
     with open(json_file, "r") as f:
         data = json.load(f)
 
-    config_path = args.config_path
+    dist_config_path = args.dist_config_path
     dist_model = tools.DistModel(
-        config_path
+        dist_config_path
+    )
+
+    inclusion_config_path = args.inclusion_config_path
+    inclusion_model = tools.InclusionModel(
+        inclusion_config_path
     )
 
     data_dir = args.data_dir
 
     predictions = []
     for item in tqdm(data):
-        prediction = pred(item, dist_model, data_dir)
+        prediction = pred(item, dist_model, inclusion_model, data_dir)
         predictions.append({STR_ID: item[STR_ID], STR_NORMALIZED_ANSWER: prediction})
 
     prediction_file = args.prediction_file
