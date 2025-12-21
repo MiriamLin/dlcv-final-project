@@ -64,12 +64,16 @@ def main(args):
     torch.manual_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    use_rgb = args.use_rgb
+    use_depth = args.use_depth
+
     # Training dataset & loader
     dataset = InsideDataset(
         json_path=args.json,
         image_dir=args.image_dir,
         depth_dir=args.depth_dir,
-        use_depth=False
+        use_depth=use_depth,
+        use_rgb=use_rgb
     )
     train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
 
@@ -81,11 +85,14 @@ def main(args):
         json_path=val_json,
         image_dir=val_image_dir,
         depth_dir=val_depth_dir,
-        use_depth=False
+        use_depth=use_depth,
+        use_rgb=use_rgb
     )
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
-    model = ResNet50Binary(in_channels=5)
+    
+    in_channels = 2 + use_depth + 3 * use_rgb
+    model = ResNet50Binary(in_channels=in_channels)
     model = model.to(device)
 
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-2)
@@ -111,5 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--save_path", type=str, default="ckpt")
+    parser.add_argument("--use_rgb", action="store_true")
+    parser.add_argument("--use_depth", action="store_true")
     args = parser.parse_args()
     main(args)
