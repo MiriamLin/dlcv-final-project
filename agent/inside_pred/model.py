@@ -1,13 +1,6 @@
-import os
-import json
-import numpy as np
-from PIL import Image
 import torch
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, models
+from torchvision import models
 import torch.nn as nn
-import torch.nn.functional as F
-import pycocotools.mask as mask_utils  # install pycocotools if needed
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 

@@ -3,10 +3,8 @@ import json
 import numpy as np
 from PIL import Image, ImageFile
 import torch
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, models
-import torch.nn as nn
-import torch.nn.functional as F
+from torch.utils.data import Dataset
+from torchvision import transforms
 import pycocotools.mask as mask_utils
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True

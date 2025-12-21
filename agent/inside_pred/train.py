@@ -2,7 +2,7 @@ import argparse
 from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader
-from torch import nn, optim
+from torch import optim
 from data_loader import InsideDataset
 from model import ResNet50Binary
 from loss import FocalLoss
