@@ -121,7 +121,7 @@ def pred_count(item: dict, inclusion_model: tools.InclusionModel, data_dir: Path
     cat_masks = categorize_masks(question, [Mask(i) for i in item[STR_RLE]])
     assert len(cat_masks[STR_PALLET]) > 0
     buffer_mask = select_buffer(question, cat_masks[STR_BUFFER], cat_masks[STR_SHELF])
-    return np.count_nonzero([inclusion_model.predict(pallet_mask, buffer_mask, item[STR_IMAGE], data_dir) > 0.5 for pallet_mask in cat_masks[STR_PALLET]])
+    return int(np.count_nonzero([inclusion_model.predict(pallet_mask, buffer_mask, item[STR_IMAGE], data_dir) > 0.5 for pallet_mask in cat_masks[STR_PALLET]]))
 
 def select_target(question: str, cat_masks: dict[str, list[Mask]]) -> Mask:
     filtered_cat_masks = {k: v for k, v in cat_masks.items() if len(v) > 0}
