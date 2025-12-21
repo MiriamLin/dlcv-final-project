@@ -1,0 +1,5 @@
+{
+    "model_path": "inclusion.pth",
+    "use_rgb": true,
+    "use_depth": false
+}
